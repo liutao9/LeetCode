@@ -1,0 +1,145 @@
+# LeetCode 第十八题 四数相加
+> 给定一个含有 n 个整数的数组 S，数列 S 中是否存在元素 a，b，c 和 d 使 a + b + c + d = target ？  
+> 请在数组中找出所有满足各元素相加等于特定值 的 不重复 组合。  
+> 注意：解决方案集不能包含重复的四元组合。  
+> 例如，给定数组 S = [1, 0, -1, 0, -2, 2]，并且给定 target = 0。  
+  
+> 示例答案为：  
+> [  
+>   [-1,  0, 0, 1],  
+>   [-2, -1, 1, 2],  
+>   [-2,  0, 0, 2]  
+> ]  
+其实这道题和第十五道题[三数之和](https://leetcode-cn.com/problems/3sum/description/)类似，在三数之和的[解题步骤](https://github.com/liutao9/LeetCode/blob/master/001_050/015三数之和.md)基础上再添加了一道循环，变成了本次题目的四数相加。  
+同时，为了节省时间，我们又在程序中添加了几个条件判断，如果不满足条件，不在做无畏的运算了。具体请参考代码。
+## Java
+```
+
+	public static List<List<Integer>> fourSum(int[] nums, int target) {
+		List<List<Integer>> result = new LinkedList<>();
+		Arrays.sort(nums);
+		if (nums.length < 4)
+			return result;
+		int n = nums.length;
+		for (int i = 0; i < n - 3; i++) {
+			if (i > 0 && nums[i] == nums[i - 1])
+				continue;/// 相同数字的跳过，节省时间
+			if (nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target)
+				break;/// 不合理情况，直接返回，节省时间
+			if (nums[i] + nums[n - 1] + nums[n - 2] + nums[n - 3] < target)
+				continue;/// 跳过太小的数字，节省时间
+			for (int j = i + 1; j < n - 2; j++) {
+				if (j > i+1 && nums[j] == nums[j - 1])
+					continue;/// 同理
+				if ((j + 2) < n && nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target)
+					break;
+				if (nums[i] + nums[j] + nums[n - 1] + nums[n - 2] < target)
+					continue;
+				int left = j + 1, right = n - 1;
+				while (left < right) {
+					int current_sum = nums[i] + nums[j] + nums[left] + nums[right];
+					if (current_sum == target) {
+						result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
+						while (left < right && nums[left] == nums[left + 1])
+							left++;
+						while (left < right && nums[right] == nums[right - 1])
+							right--;
+						left++;
+						right--;
+					} else if (current_sum < target) {
+						left++;
+					} else {
+						right--;
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+```
+## C++
+```
+
+class Solution
+{
+public:
+    vector<vector<int> > fourSum(vector<int>& nums,int target)
+    {
+        vector<vector<int> > result=vector<vector<int> >();
+        if(nums.size()<4)return result;
+        sort(nums.begin(),nums.end());
+        int n = nums.size();
+        for(int i=0; i<n-3; i++)
+        {
+            if(i>0&&nums[i]==nums[i-1])continue;
+            if(nums[i]+nums[i+1]+nums[i+2]+nums[i+3]>target)break;
+            if(nums[i]+nums[n-3]+nums[n-2]+nums[n-1]<target)continue;
+            for(int j=i+1; j<n-2; j++)
+            {
+                if(j>i+1&&nums[j]==nums[j-1])continue;///一定是j>j+1而不是j>0 要确保第一个数字被检查
+                if(nums[i]+nums[j]+nums[j+1]+nums[j+2]>target)break;
+                if(nums[i]+nums[j]+nums[n-2]+nums[n-1]<target)continue;
+                int low=j+1,high=n-1;
+                while(low<high)
+                {
+                    int current_sum=nums[i]+nums[j]+nums[low]+nums[high];
+                    if(current_sum==target)
+                    {
+                        vector<int>vec=vector<int>();
+                        vec.push_back(nums[i]);
+                        vec.push_back(nums[j]);
+                        vec.push_back(nums[low]);
+                        vec.push_back(nums[high]);
+                        result.push_back(vec);
+                        while(low<high&&nums[low]==nums[low+1])low++;
+                        while(low<high&&nums[high]==nums[high-1])high--;
+                        low++;
+                        high--;
+                    }
+                    else if(current_sum<target)
+                        low++;
+                    else
+                        high--;
+                }
+            }
+        }
+
+
+        return result;
+    }
+};
+```
+## Python
+```
+class Solution(object):
+    def fourSum(self, nums, target):
+        result = []
+        if len(nums) < 4:
+            return result
+        nums = sorted(nums)
+        n = len(nums)
+        for i in range(n - 3):
+            if (i > 0 and nums[i] == nums[i - 1]): continue
+            if (nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target): break
+            if (nums[i] + nums[n - 3] + nums[n - 2] + nums[n - 1] < target): continue
+            for j in range(i + 1, n - 2):
+                if (j > i + 1 and nums[j] == nums[j - 1]): continue
+                if (nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target): break
+                if (nums[i] + nums[j] + nums[n - 2] + nums[n - 1] < target): continue
+                low, high = j + 1, n - 1
+                while (low < high):
+                    current_sum = nums[i] + nums[j] + nums[low] + nums[high]
+                    if (current_sum == target):
+                        result.append([nums[i], nums[j], nums[low], nums[high]])
+                        while (low < high and nums[low] == nums[low + 1]): low = low + 1
+                        while (low < high and nums[high] == nums[high - 1]): high = high - 1
+                        low = low + 1
+                        high = high - 1
+                    elif current_sum < target:
+                        low = low + 1
+                    else:
+                        high = high - 1
+        return result
+
+```
